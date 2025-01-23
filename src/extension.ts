@@ -9,28 +9,6 @@ import { postMessageToWebView } from './utilities/webviewCommunication';
 import { getWebviewHTML, getWebviewPanel } from './utilities/webviewPanel';
 import { findModuleRoot, getRelatedResources } from './utilities/git_fns';
 
-type ToolParams = {
-  pattern: string;
-}
-export class BackstoryTool implements vscode.LanguageModelTool<ToolParams> {
-	async invoke(
-		options: vscode.LanguageModelToolInvocationOptions<ToolParams>,
-	) {
-
-		return new vscode.LanguageModelToolResult([
-      new vscode.LanguageModelTextPart('tool result:'+options.input.pattern)
-    ]);
-	}
-
-	async prepareInvocation(
-		options: vscode.LanguageModelToolInvocationPrepareOptions<ToolParams>
-	) {
-		return {
-			invocationMessage: `Searching workspace for "${options.input.pattern}"`,
-		};
-	}
-}
-
 export async function activate(extensionContext: ExtensionContext) {
   console.log(`Registering extension "${EXTENSION_ID}"`);
   try{

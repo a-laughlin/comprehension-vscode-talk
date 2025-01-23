@@ -12,7 +12,6 @@ export const postMessageToWebView = async (
   data:Omit<MessageToWebView['data'],'extensionCommand'>
 ) =>{
   const _data = dataWithCommand(command,data);
-  console.log(`MessageToWebview`,_data);
   const msg = {
     command,
     data:JSON.stringify(_data),
