@@ -2,7 +2,7 @@
   "name": "comprehension",
   "displayName": "Comprehension Lens",
   "publisher": "alaughlin",
-  "description": "Understand Code Faster",
+  "description": "Understand Faster",
   "icon": "out/assets/logo128x128.png",
   "version": "0.0.11",
   "engines": {
@@ -10,11 +10,25 @@
     "node": ">=20"
   },
   "categories": [],
-  "// when running as formatter, add onLanguage to activationEvents": "",
-  "activationEvents": [
-    "onStartupFinished"
-  ],
+  "//activationEvents - for when the extension should be activated": "",
+  "activationEvents": [ "onStartupFinished" ],
   "main": "./out/extension.js",
+  "//commands - for the command palette": "",
+  "commands": [
+    {
+      "command": "comprehension.backstory",
+      "title": "Comprehension Backstory"
+    }
+  ],
+  "//menus - for where to see the command outside of the palette": "",
+  "menus": {
+    "editor/context": [
+      {
+        "command": "comprehension.backstory"
+      }
+    ]
+  },
+  "//contributes - for the resources it contributes": "",
   "contributes": {
     "languageModelTools": [
       {
@@ -40,20 +54,7 @@
 				}
 			}
     ],
-    "configuration": [],
-    "commands": [
-      {
-        "command": "comprehension.backstory",
-        "title": "Comprehension Backstory"
-      }
-    ],
-    "menus": {
-      "editor/context": [
-        {
-          "command": "comprehension.backstory"
-        }
-      ]
-    }
+    "configuration": []
   },
   "scripts": {
     "install:all": "npm install && cd webview && npm install",
