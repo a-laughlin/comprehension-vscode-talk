@@ -1,0 +1,30 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.trimTrailingWhitespaceInRegexAndStrings": false,
+    "[javascript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features",
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features",
+    },
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "eslint.ignoreUntitled": true,
+    "eslint.lintTask.enable": true,
+    "eslint.enable": true,
+    "eslint.workingDirectories": [
+      "./"
+    ],
+    "eslint.useFlatConfig": true,
+    // "eslint.debug": true
+    "markdown.styles": [
+      "MarkdownStyle.css"
+    ],
+    "markdown.preview.markEditorSelection": false,
+    "markdown.preview.scrollEditorWithPreview": false
+  }
+}

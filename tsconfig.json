@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "target": "ESNext",
+    "outDir": "out",
+    "lib": ["ESNext"],
+    "rootDir": "./",
+    "strict": true,
+    "skipLibCheck": true,
+    "noUncheckedIndexedAccess": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "moduleResolution": "NodeNext",
+    // "esModuleInterop": true,
+    "checkJs": true,
+    // ESBuild emits, so no need for tsc to do it
+    "sourceMap": false,
+    "noEmit":true,
+    "noEmitOnError": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    ".vscode-test",
+    ".vscode",
+    "webview",
+    "src/test_fixtures",
+    "src/test_fixtures/**/*",
+    "out",
+    "dist"
+  ],
+}

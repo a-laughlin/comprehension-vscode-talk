@@ -1,0 +1,91 @@
+{
+  "name": "comprehension",
+  "displayName": "Comprehension Lens",
+  "publisher": "alaughlin",
+  "description": "Understand Code Faster",
+  "icon": "out/assets/logo128x128.png",
+  "version": "0.0.11",
+  "engines": {
+    "vscode": ">=1.93.0",
+    "node": ">=20"
+  },
+  "categories": [],
+  "// when running as formatter, add onLanguage to activationEvents": "",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languageModelTools": [
+      {
+				"name": "chat-tools-sample_findFiles",
+				"tags": [
+					"files",
+					"search",
+					"chat-tools-sample"
+				],
+				"displayName": "Find Files",
+				"modelDescription": "Search for files in the current workspace",
+				"inputSchema": {
+					"type": "object",
+					"properties": {
+						"pattern": {
+							"type": "string",
+							"description": "Search for files that match this glob pattern"
+						}
+					},
+					"required": [
+						"pattern"
+					]
+				}
+			}
+    ],
+    "configuration": [],
+    "commands": [
+      {
+        "command": "comprehension.backstory",
+        "title": "Comprehension Backstory"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "comprehension.backstory"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "install:all": "npm install && cd webview && npm install",
+    "//build:development": "used by launch/tasks json to start the extension. watchWithDashboard then runs. See it for further details.",
+    "build:development": "cd webview && npm run build:development && cd - && NODE_ENV='development' node esbuild.cjs",
+    "//build:production": "builds the extension and builds/minifies/bundles the webview",
+    "build:production": "tsc -p ./ && eslint src && cd webview && npm run build:production && cd - && NODE_ENV='production' node esbuild.cjs",
+    "//package:dry": "shows what a built vsix file would contain",
+    "package:dry": "npm run build:production && vsce ls",
+    "//package": "creates a vsix file for installing the extension.",
+    "package": "npm run build:production; vsce package",
+    "//publish": "runs all build/package steps and publishes the output to the marketplace.",
+    "publish": "npm run package; npm version patch -m 'Upgrade to version %s'; vsce publish",
+    "//test": "test uses nodemon since trying to coordinate all the separate tools' watches was horrible",
+    "test": "nodemon --watch src --ext ts --exec 'node esbuild.cjs --development && vscode-test'",
+    "//test-nowatch": "test without watching",
+    "test-nowatch": "node esbuild.cjs --development && vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "10.0.10",
+    "@types/node": "22.10.8",
+    "@types/uuid": "10.0.0",
+    "@types/vscode": "1.96.0",
+    "@vscode/test-cli": "0.0.10",
+    "@vscode/test-electron": "2.4.1",
+    "@vscode/vsce": "3.2.1",
+    "esbuild": "0.24.2",
+    "nodemon": "3.1.9",
+    "type-fest": "4.33.0"
+  },
+  "dependencies": {
+    "effect": "3.12.7",
+    "typescript": "5.7.3"
+  }
+}

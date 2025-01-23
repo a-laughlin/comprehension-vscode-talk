@@ -1,0 +1,23 @@
+{
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "../../../backstage/packages"
+    },
+    {
+      "path": "../../../cypress/packages"
+    }
+  ],
+  "settings": {
+    // ignore
+    "[javascript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "workbench.colorTheme": "Default Dark+",
+  }
+}

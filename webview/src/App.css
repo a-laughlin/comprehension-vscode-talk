@@ -1,0 +1,82 @@
+/* Reset */
+/* Use a more-intuitive box-sizing model. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+/* Remove default margin */
+* { margin: 0; }
+/* Remove built-in form typography styles */
+input, button, textarea, select {
+  font: inherit;
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root, main {
+  color: var(--vscode-editor-foreground);
+  background: var(--vscode-editor-backgground);
+
+  /* height: 100vh; */
+  /* max-height: 100vh; */
+  margin:0;
+  padding:0;
+  border:none;
+  min-width: 320px;
+  scrollbar-color: var(--vscode-scrollbarSlider-background) transparent;
+
+}
+
+main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  gap: var(--space-5);
+}
+
+h1{font-size:1.4em;} /* margin-bottom:0.6em */
+h2{font-size:1.3em;} /* margin-bottom:0.45em */
+h3{font-size:1.2em;} /* margin-bottom:0.3em */
+h4{font-size:1.1em;} /* margin-bottom:0.15em */
+
+.progress {
+  width:100%;
+  padding:0 var(--space-3);
+}
+.DashboardContent {
+  padding:0 var(--space-3);
+}
+.DashboardContent .fileNameSkeleton{
+  background-color:var(--slate-7);
+  animation:none !important;
+}
+
+
+/* Popovers */
+.PopoverContent {
+  font-size: 80%;
+  width: auto;
+  max-width:var(--radix-popover-content-available-width);
+  height: auto;
+  max-height: var(--radix-popover-content-available-height);
+}
+.PopoverContent h1 {
+  font-size:120%;
+}
+.PopoverTriggerInline {
+  margin-left:0.2em;
+  vertical-align:middle;
+}
