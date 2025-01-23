@@ -6,21 +6,21 @@
   "icon": "out/assets/logo128x128.png",
   "version": "0.0.11",
   "engines": {
-    "vscode": ">=1.93.0",
+    "vscode": ">=1.91.0",
     "node": ">=20"
   },
   "categories": [],
-  "//activationEvents - for when the extension should be activated": "",
-  "activationEvents": [ "onStartupFinished" ],
   "main": "./out/extension.js",
-  "//commands - for the command palette": "",
+
+  "activationEvents": [ "onStartupFinished" ],
+
   "commands": [
     {
       "command": "comprehension.backstory",
       "title": "Comprehension Backstory"
     }
   ],
-  "//menus - for where to see the command outside of the palette": "",
+
   "menus": {
     "editor/context": [
       {
@@ -28,7 +28,7 @@
       }
     ]
   },
-  "//contributes - for the resources it contributes": "",
+
   "contributes": {
     "languageModelTools": [
       {
@@ -56,6 +56,7 @@
     ],
     "configuration": []
   },
+
   "scripts": {
     "install:all": "npm install && cd webview && npm install",
     "//build:development": "used by launch/tasks json to start the extension. watchWithDashboard then runs. See it for further details.",

@@ -14,7 +14,9 @@ export default function App(){
         <p>Commit Summaries:</p>
         {
           data.summary===''
-          ? <Progress duration={`3s`} style={{width:'100%',height:'30px'}} />
+          ? <div style={{width:'100%',height:'30px'}}>
+              <Progress duration={`3s`} style={{width:'100%',height:'30px'}} />
+            </div>
           : <DataList.Root>
               {data.summary.split('\n')
                 .map((line,i)=><DataList.Item key={i}>{line}</DataList.Item>)
