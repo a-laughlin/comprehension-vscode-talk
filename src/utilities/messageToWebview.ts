@@ -16,5 +16,7 @@ export const postMessageToWebView = async (
     command,
     data:JSON.stringify(_data),
   };
+  console.log('postMessageToWebView');
+  console.log(msg);
   await webView.postMessage(msg);
 };

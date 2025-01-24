@@ -6,30 +6,34 @@
   "icon": "out/assets/logo128x128.png",
   "version": "0.0.11",
   "engines": {
-    "vscode": ">=1.91.0",
+    "vscode": ">=1.93.0",
     "node": ">=20"
   },
   "categories": [],
   "main": "./out/extension.js",
 
+  "//activationEvents - for when the extension should be activated": "",
   "activationEvents": [ "onStartupFinished" ],
 
-  "commands": [
-    {
-      "command": "comprehension.backstory",
-      "title": "Comprehension Backstory"
-    }
-  ],
-
-  "menus": {
-    "editor/context": [
-      {
-        "command": "comprehension.backstory"
-      }
-    ]
-  },
-
   "contributes": {
+    "//commands - for the command palette": "",
+    "commands": [
+      {
+        "command": "comprehension.backstory",
+        "title": "Comprehension Backstory"
+      }
+    ],
+
+    "//menus - for where the command should appear": "",
+    "menus": {
+      "editor/context": [
+        {
+          "command": "comprehension.backstory"
+        }
+      ]
+    },
+
+    "//languageModelTools - to enable programmatic AI calls": "",
     "languageModelTools": [
       {
 				"name": "chat-tools-sample_findFiles",
@@ -56,7 +60,6 @@
     ],
     "configuration": []
   },
-
   "scripts": {
     "install:all": "npm install && cd webview && npm install",
     "//build:development": "used by launch/tasks json to start the extension. watchWithDashboard then runs. See it for further details.",

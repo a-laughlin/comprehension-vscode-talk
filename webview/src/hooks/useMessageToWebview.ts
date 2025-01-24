@@ -23,7 +23,7 @@ const mergeToNextState = (prevData:WebViewData,newData:SetWebviewDataArgs):WebVi
     : ({...prevData,...newData});
 }
 
-export const useExtensionData = ()=>useContext(extensionDataContext);
+export const useMessageToWebview = ()=>useContext(extensionDataContext);
 
 export const useExtensionDataForProvider = ():ExtensionDataContextType=>{
   const initialState = useMemo(()=>{
@@ -41,6 +41,7 @@ export const useExtensionDataForProvider = ():ExtensionDataContextType=>{
 
   const [data,setComponentData] = useState<MessageToWebView['data']>(initialState);
 
+  /** sets data in the react component, and the vscode tab state so tabbing out and returning works */
   const setComponentAndTabCache = useCallback(( newData:SetWebviewDataArgs ):void=>{
     setComponentData((prevData)=>{
       const nextState = mergeToNextState(prevData,newData);

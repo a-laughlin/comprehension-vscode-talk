@@ -17,10 +17,15 @@ export type WebViewData = {
    */
   readonly filePath:string,
   /**
-   * summary
-   * the summary of the file
+   * commitSummaries
+   * summarized commit messages
    */
-  summary:string
+  readonly commitSummaries:string
+  /**
+   * prSummaries
+   * summarized pr messages
+   */
+  readonly prSummaries:string
 };
 
 export type MessageToWebView = {
@@ -53,7 +58,8 @@ export const DASHBOARD_TITLE = 'Comprehension Lens';
 export const WEBVIEW_DATA_DEFAULTS:WebViewData = {
   extensionCommand:'openDashboard',
   filePath:'',
-  summary:'',
+  commitSummaries:'',
+  prSummaries:''
 };
 
 

@@ -5,9 +5,9 @@ import { relative } from 'node:path';
 import vscode,{commands, ExtensionContext, window, WebviewPanel } from "vscode";
 import { EXTENSION_ID, WEBVIEW_DATA_DEFAULTS } from "./shared";
 import { maybeWatch } from './utilities/maybeWatch';
-import { postMessageToWebView } from './utilities/webviewCommunication';
+import { postMessageToWebView } from './utilities/messageToWebview';
 import { getWebviewHTML, getWebviewPanel } from './utilities/webviewPanel';
-import { findModuleRoot, getRelatedResources } from './utilities/git_fns';
+import { findModuleRoot, getRelatedResources } from './utilities/getRelatedResources';
 
 export async function activate(extensionContext: ExtensionContext) {
   console.log(`Registering extension "${EXTENSION_ID}"`);
@@ -49,7 +49,8 @@ export async function activate(extensionContext: ExtensionContext) {
         });
 
 
-        const {commitMessages,issues,prs} = await getRelatedResources(repoRootPath, gitFilePath, selection);
+        const {commits,prs} = await getRelatedResources(repoRootPath, gitFilePath, selection);
+
 
         // select the 4o chat model
         let [model] = await vscode.lm.selectChatModels({
@@ -57,31 +58,56 @@ export async function activate(extensionContext: ExtensionContext) {
           family: 'gpt-4o',
         });
 
-        // init the chat message
-        const messages = [
-          vscode.LanguageModelChatMessage.User('please summarize the following commit messages, keeping any numbers present in them:'),
-          vscode.LanguageModelChatMessage.User(commitMessages.join('\n\n')),
-        ];
 
 
         if (model) {
+          // accumulate commit summaries
+          const commitChats = [
+            vscode.LanguageModelChatMessage.User('please summarize the following commit messages:'),
+            vscode.LanguageModelChatMessage.User(
+              commits
+              .map(({message})=>message)
+              .join('\n\n')
+            ),
+          ];
           // send the messages array to the model and get the response
-          let chatResponse = await model.sendRequest(
-            messages,
-            {},
-            new vscode.CancellationTokenSource().token
-          );
+          const commitChatResponse = await model.sendRequest( commitChats, {}, new vscode.CancellationTokenSource().token);
 
           // handle chat response
-          let accumulatedResponse = '';
-          for await (const fragment of chatResponse.text) {
-            accumulatedResponse += fragment;
+          let commitResponseText = '';
+          for await (const fragment of commitChatResponse.text) {
+            commitResponseText += fragment;
             // wait to make each word print separately instead of in jarring chunks
             await new Promise(resolve => setTimeout(resolve, 100));
             await postMessageToWebView(
               currentPanel.webview,
               'analyzedFiles',
-              {summary: accumulatedResponse,filePath: gitFilePath}
+              {commitSummaries: commitResponseText,prSummaries:'',filePath: gitFilePath}
+            );
+          }
+
+          // accumulate PR summaries
+          const prChats = [
+            vscode.LanguageModelChatMessage.User('please summarize the following pr messages:'),
+            vscode.LanguageModelChatMessage.User(
+              prs
+              .map((pr)=>pr.associatedPullRequests.edges[0]!.node.bodyText)
+              .join('\n\n')
+            ),
+          ];
+          // send the messages array to the model and get the response
+          const prChatResponse = await model.sendRequest( prChats, {}, new vscode.CancellationTokenSource().token);
+
+          // handle chat response
+          let prResponseText = '';
+          for await (const fragment of prChatResponse.text) {
+            prResponseText += fragment;
+            // wait to make each word print separately instead of in jarring chunks
+            await new Promise(resolve => setTimeout(resolve, 100));
+            await postMessageToWebView(
+              currentPanel.webview,
+              'analyzedFiles',
+              {commitSummaries: commitResponseText,prSummaries:prResponseText,filePath: gitFilePath}
             );
           }
         }

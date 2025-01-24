@@ -8,15 +8,33 @@ import { tmpdir } from 'node:os';
 import { Merge } from 'type-fest';
 import vscode,{ window } from 'vscode';
 import { partition } from 'effect/Array';
+import { get } from 'node:http';
 
 export const getRelatedResources = async(repoRootPath:string,filePath:string,selection:string)=>{
-  const commitMessages = await getLocalCommitMessages(repoRootPath,filePath,selection);
-  console.log('commitMessages',commitMessages);
-  // const issueNumbers = commitMessagesToIssueNumbers(commitMessages);
-  // const {issues,prs} = await issueNumbersToIssuesAndPrContents(repoRootPath)(issueNumbers);
-  const {issues,prs} = {issues:[],prs:[]};
-  return {commitMessages,issues,prs};
+  return {
+    commits: await getLocalCommitMessages(repoRootPath,filePath,selection),
+    prs:getPrs()
+  };
 }
+
+const getPrs = ()=>{
+  // pretend that this came from Github's GraphQL API
+  return [
+    {
+      "id": "MDY6Q29tbWl0MjM2MDk1NTc2OjAxNDVmYWE2ZWUyZmFmOGQ0OTM4YzdkNTE4ZjA1M2E2MzQwMDk4MTE=",
+      "associatedPullRequests": {
+        "edges": [
+          {
+            "node": {
+              "title": "cli: add versions:check and versions:bump",
+              "bodyText": "Hey, I just made a Pull Request!\nAdds backstage-cli versions:bump and backstage-cli versions:check, which allow users to bump @backstage packages to the latest versions, and remove duplicates.\nThe bump commands will pull down the latest version of each @backstage package and then run a deduplication. The idea is that this command can be used to easily stay on top of the latest releases without having to manually sift though package.jsons. There's currently no way to select which weekly release of the packages to use, it will always use the latest release. The metadata returned from npm contains enough information about the releases that it should be possible to add that if we want to.\nThe check command will detect duplicates of the @backstage packages and warn the user. If the --fix flag is provided, it will act like yarn-deduplicate and get rid of any duplicates that can be removed while staying within the requested version range. It will also warn about packages that can't be deduplicated automatically, and exit with an error if any of those packages are known to not function if there are duplicates, such as @backstage/core.\nFixes #3185, although will likely leave this undocumented until after the next release. I did some local verification but want to make sure this works properly with a released version too.\n✔️ Checklist\n\n\n A changeset describing the change and affected packages. (more info)\n Added or updated documentation\n Tests for new functionality and regression tests for bug fixes\n Screenshots attached (for UI changes)"
+            }
+          }
+        ]
+      }
+    }
+  ];
+};
 
 const getLocalCommitMessages = (
   repoRootPath: string,
@@ -33,97 +51,25 @@ const getLocalCommitMessages = (
   const delimiter = '===COMMIT_DELIMITER===';
   // example: git log -S"  if (options.fromPackage) {" --pretty=format:"%h%n%B===COMMIT_DELIMITER===" -- packages/cli/src/lib/config.ts
 
-  const gitCommand = `git log -S"${escapedSelection}" --pretty=format:"%ad %B${delimiter}" --date=format:"%Y-%m-%d" -- ${pathFromRepoRoot}`;
-  console.log('gitCommand',gitCommand);
+  const gitCommand = `git log -S"${escapedSelection}" --pretty=format:"%h %ad %B${delimiter}" --date=format:"%Y-%m-%d" -- ${pathFromRepoRoot}`;
   return execFn(gitCommand, repoRootPath)
-    // @ts-expect-error
-    .then(result=>console.log(result)||result.split(delimiter).filter(Boolean))
+    .then(result=>{
+      console.log(result);
+      return result
+        .split(delimiter)
+        .filter(Boolean)
+        .map(commit=>{
+          const commitParts = commit.trim().match(/^(.+?) (.+?) ([\s\S]+)$/) ?? [];
+          const [,sha,date,message] = commitParts;
+          return {sha,date,message} as {sha:string,date:string,message:string};
+        })
+    })
     .catch(e=>{
       console.log('Error getting commit messages:');
       console.error(e);
       return [];
     });
 };
-
-
-
-const commitMessagesToIssueNumbers = (commitMessages:string[])=>
-  commitMessages.flatMap(
-    message=>(message.match(/\#\d+/g) ?? []).map(issue=>issue.slice(1))
-  );
-
-const issueNumbersToIssuesAndPrContents = (repoRootPath:string)=>async (issueNumbers: string[]) => {
-  // Get repo owner and name from remote URL
-  const remoteUrl = execSync('git config --get remote.origin.url', {cwd: repoRootPath}).toString().trim();
-  const [owner, repo] = remoteUrl.match(/[\/:]([^\/]+)\/([^\/]+?)(?:\.git)?$/i)?.slice(1) ?? [];
-
-  if (!owner || !repo) {
-    throw new Error('Could not determine repository owner and name');
-  }
-
-  // Build a single GraphQL query for all issue numbers
-  const query = `
-    query($owner: String!, $repo: String!, $numbers: [Int!]!) {
-      repository(owner: $owner, name: $repo) {
-        nodes: issueOrPullRequests(numbers: $numbers) {
-          ... on Issue {
-            title
-            body
-            number
-            url
-            type: __typename
-          }
-          ... on PullRequest {
-            title
-            body
-            number
-            url
-            type: __typename
-          }
-        }
-      }
-    }
-  `;
-
-  try {
-    const response = await fetch('https://api.github.com/graphql', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query,
-        variables: {
-          owner,
-          repo,
-          numbers: issueNumbers.map(num => parseInt(num.replace('#', ''), 10))
-        }
-      })
-    });
-
-    const json = await response.json() as {
-      data?: {
-        repository?: {
-          nodes?: Array<{
-            title: string;
-            body: string;
-            number: number;
-            url: string;
-            type: string;
-          }>
-        }
-      }
-    };
-
-    const nodes = json.data?.repository?.nodes ?? [];
-    const [issues,prs] = partition(nodes,node=>node.type === 'Issue');
-    return {issues,prs};
-  } catch (error) {
-    console.error('Error fetching issues/PRs:', error);
-    return {issues:[],prs:[]};
-  }
-}
 
 /**
  * shortens any strings containing `Library/CloudStorage/Dropbox` to `Dropbox`
